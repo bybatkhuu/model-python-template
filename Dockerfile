@@ -73,7 +73,8 @@ ENV UID=${UID} \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/* && \
+RUN --mount=type=secret,id=HASH_PASSWORD \
+	rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/* && \
 	apt-get clean -y && \
 	apt-get update --fix-missing -o Acquire::CompressionTypes::Order::=gz && \
 	apt-get install -y --no-install-recommends \
@@ -111,7 +112,11 @@ RUN rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/*
 	useradd -lmN -d "/home/${USER}" -s /bin/bash -g ${GROUP} -G sudo -u ${UID} ${USER} && \
 	echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
 	chmod 0440 "/etc/sudoers.d/${USER}" && \
-	echo -e "${USER}:${HASH_PASSWORD}" | chpasswd -e && \
+	if [ -f "/run/secrets/HASH_PASSWORD" ]; then \
+		echo -e "${USER}:$(cat /run/secrets/HASH_PASSWORD)" | chpasswd -e; \
+	else \
+		echo -e "${USER}:${HASH_PASSWORD}" | chpasswd -e; \
+	fi && \
 	echo -e "\nalias ls='ls -aF --group-directories-first --color=auto'" >> /root/.bashrc && \
 	echo -e "alias ll='ls -alhF --group-directories-first --color=auto'\n" >> /root/.bashrc && \
 	echo -e "\numask 0002" >> "/home/${USER}/.bashrc" && \
