@@ -86,11 +86,11 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.arithmatex:
-      generic: true
-extra_javascript:
-  - assets/js/mathjax.js
-  - assets/js/tex-mml-chtml.js
+#   - pymdownx.arithmatex:
+#       generic: true
+# extra_javascript:
+#   - assets/js/mathjax.js
+#   - assets/js/tex-mml-chtml.js
 plugins:
   - meta
   - tags
