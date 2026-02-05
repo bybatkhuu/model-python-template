@@ -18,6 +18,8 @@ FROM ${BASE_IMAGE} AS builder
 ARG DEBIAN_FRONTEND
 ARG PROJECT_SLUG
 
+ENV	UV_LINK_MODE=copy
+
 ARG PYTHON_VERSION=3.10
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -35,7 +37,7 @@ RUN --mount=type=cache,target=/opt/conda/pkgs,sharing=private \
 		ca-certificates \
 		build-essential \
 		wget && \
-	_MINICONDA_VERSION=py310_25.7.0-2 && \
+	_MINICONDA_VERSION=py310_25.11.1-1 && \
 	if [ "${_BUILD_TARGET_ARCH}" == "x86_64" ]; then \
 		_MINICONDA_FILENAME=Miniconda3-${_MINICONDA_VERSION}-Linux-x86_64.sh && \
 		export _MINICONDA_URL=https://repo.anaconda.com/miniconda/${_MINICONDA_FILENAME}; \
@@ -56,16 +58,15 @@ RUN --mount=type=cache,target=/opt/conda/pkgs,sharing=private \
 	/opt/conda/condabin/conda config --append channels conda-forge && \
 	/opt/conda/condabin/conda update -y conda && \
 	/opt/conda/condabin/conda install -y python=${PYTHON_VERSION} pip && \
-	/opt/conda/bin/pip install --timeout 60 -U pip
+	/opt/conda/bin/pip install --timeout 60 -U pip uv
 
 COPY ./ ./
 RUN	--mount=type=cache,target=/root/.cache,sharing=locked \
-	/opt/conda/bin/pip install --timeout 60 -r ./requirements/requirements.test.txt && \
-	/opt/conda/bin/pip install --timeout 60 -r ./requirements/requirements.build.txt && \
+	/opt/conda/bin/python -m uv pip install -r ./requirements/requirements.test.txt && \
+	/opt/conda/bin/python -m uv pip install -r ./requirements/requirements.build.txt && \
 	# /opt/conda/bin/python -m build -w && \
-	# /opt/conda/bin/pip install --timeout 60 ./dist/*.whl && \
-	/opt/conda/bin/pip install --timeout 60 jupyterlab jupyterlab-lsp "python-lsp-server[all]" nvitop
-
+	# /opt/conda/bin/python -m uv pip install ./dist/*.whl && \
+	/opt/conda/bin/python -m uv pip install jupyterlab jupyterlab-lsp "python-lsp-server[all]" nvitop
 
 ## Here is the base image:
 FROM ${BASE_IMAGE} AS base
