@@ -11,7 +11,7 @@ To build the documentation, run the following command:
 pip install -r ./requirements/requirements.docs.txt
 
 # Serve documentation locally (for development):
-mkdocs serve
+mkdocs serve -a 0.0.0.0:8000 --livereload
 # Or use the docs script:
 ./scripts/docs.sh
 

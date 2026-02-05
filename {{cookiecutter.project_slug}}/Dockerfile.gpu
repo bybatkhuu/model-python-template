@@ -18,6 +18,8 @@ FROM ${BASE_IMAGE} AS builder
 ARG DEBIAN_FRONTEND
 ARG PROJECT_SLUG
 
+ENV	UV_LINK_MODE=copy
+
 ARG PYTHON_VERSION={{cookiecutter.python_version}}
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -35,7 +37,7 @@ RUN --mount=type=cache,target=/opt/conda/pkgs,sharing=private \
 		ca-certificates \
 		build-essential \
 		wget && \
-	_MINICONDA_VERSION=py310_25.7.0-2 && \
+	_MINICONDA_VERSION=py310_25.11.1-1 && \
 	if [ "${_BUILD_TARGET_ARCH}" == "x86_64" ]; then \
 		_MINICONDA_FILENAME=Miniconda3-${_MINICONDA_VERSION}-Linux-x86_64.sh && \
 		export _MINICONDA_URL=https://repo.anaconda.com/miniconda/${_MINICONDA_FILENAME}; \
@@ -56,16 +58,15 @@ RUN --mount=type=cache,target=/opt/conda/pkgs,sharing=private \
 	/opt/conda/condabin/conda config --append channels conda-forge && \
 	/opt/conda/condabin/conda update -y conda && \
 	/opt/conda/condabin/conda install -y python=${PYTHON_VERSION} pip && \
-	/opt/conda/bin/pip install --timeout 60 -U pip
+	/opt/conda/bin/pip install --timeout 60 -U pip uv
 
 COPY ./ ./
 RUN	--mount=type=cache,target=/root/.cache,sharing=locked \
-	/opt/conda/bin/pip install --timeout 60 -r ./requirements/requirements.test.txt && \
-	/opt/conda/bin/pip install --timeout 60 -r ./requirements/requirements.build.txt && \
+	/opt/conda/bin/python -m uv pip install -r ./requirements/requirements.test.txt && \
+	/opt/conda/bin/python -m uv pip install -r ./requirements/requirements.build.txt && \
 	# /opt/conda/bin/python -m build -w && \
-	# /opt/conda/bin/pip install --timeout 60 ./dist/*.whl && \
-	/opt/conda/bin/pip install --timeout 60 jupyterlab jupyterlab-lsp "python-lsp-server[all]" nvitop
-
+	# /opt/conda/bin/python -m uv pip install ./dist/*.whl && \
+	/opt/conda/bin/python -m uv pip install jupyterlab jupyterlab-lsp "python-lsp-server[all]" nvitop
 
 ## Here is the base image:
 FROM ${BASE_IMAGE} AS base
@@ -74,8 +75,8 @@ ARG DEBIAN_FRONTEND
 ARG PROJECT_SLUG
 
 ## IMPORTANT!: Get hashed password from build-arg!
-## echo "USER_PASSWORD123" | openssl passwd -5 -stdin
-ARG HASH_PASSWORD="\$5\$Jl675L6M1BQQTRWr\$O35sVvpaT4dQVt.G9o9ZDnp0i1Ub05rEqfEzb8Gh00D"
+## echo "USER_PASSWORD123" | openssl passwd -6 -stdin
+ARG HASH_PASSWORD="\$6\$E262BgUoc/atUJ.9\$15DcOM.oC8TDlslhRFMvEm4vyx1W7GDrf1Ica0U78q5d5GupC0iNlwa7yP9LzmS3YeaIw5XwONm.1QuArpYu20"
 ## python -c "from jupyter_server.auth import passwd; print(passwd('USER_PASSWORD123'))"
 # ARG JUPYTERLAB_PASSWORD_HASH="argon2:\$argon2id\$v=19\$m=10240,t=10,p=8\$wnIeLsNlGKEyUUTxl1lVSg\$dy9k/D3w95OpTbAJbm3nl5Q+J97cmA/RG4whANSBKZk" # pragma: allowlist secret
 ARG UID=1000
@@ -104,7 +105,8 @@ ENV UID=${UID} \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/* && \
+RUN --mount=type=secret,id=HASH_PASSWORD \
+	rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/* && \
 	apt-get clean -y && \
 	apt-get update --fix-missing -o Acquire::CompressionTypes::Order::=gz && \
 	apt-get install -y --no-install-recommends \
@@ -142,7 +144,11 @@ RUN rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/*
 	# usermod -l ${USER} -m -d /home/${USER} -s /bin/bash -g ${GROUP} -aG sudo ubuntu && \
 	echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
 	chmod 0440 "/etc/sudoers.d/${USER}" && \
-	echo -e "${USER}:${HASH_PASSWORD}" | chpasswd -e && \
+	if [ -f "/run/secrets/HASH_PASSWORD" ]; then \
+		echo -e "${USER}:$(cat /run/secrets/HASH_PASSWORD)" | chpasswd -e; \
+	else \
+		echo -e "${USER}:${HASH_PASSWORD}" | chpasswd -e; \
+	fi && \
 	echo -e "\nalias ls='ls -aF --group-directories-first --color=auto'" >> /root/.bashrc && \
 	echo -e "alias ll='ls -alhF --group-directories-first --color=auto'\n" >> /root/.bashrc && \
 	echo -e "\numask 0002" >> "/home/${USER}/.bashrc" && \
