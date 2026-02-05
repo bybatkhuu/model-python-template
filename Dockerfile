@@ -14,6 +14,8 @@ FROM ${BASE_IMAGE} AS builder
 ARG DEBIAN_FRONTEND
 ARG PROJECT_SLUG
 
+ENV	UV_LINK_MODE=copy
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR "/usr/src/${PROJECT_SLUG}"
@@ -22,17 +24,17 @@ COPY ./ ./
 RUN	--mount=type=cache,target=/root/.cache,sharing=locked \
 	_BUILD_TARGET_ARCH=$(uname -m) && \
 	echo "BUILDING TARGET ARCHITECTURE: ${_BUILD_TARGET_ARCH}" && \
-	python -m pip install --timeout 60 -U pip && \
+	python -m pip install --timeout 60 -U pip uv && \
 	# python -m venv .venv && \
 	# source .venv/bin/activate && \
-	# python -m pip install --timeout 60 -U pip && \
-	# python -m pip install --timeout 60 -r ./requirements/requirements.build.txt && \
+	# python -m pip install --timeout 60 -U pip uv && \
+	# python -m uv pip install --timeout 60 -r ./requirements/requirements.build.txt && \
 	# python -m build -w && \
 	# deactivate && \
-	# python -m pip install --prefix=/install --timeout 60 ./dist/*.whl && \
-	python -m pip install --prefix=/install --timeout 60 -r ./requirements/requirements.test.txt && \
-	python -m pip install --prefix=/install --timeout 60 -r ./requirements/requirements.build.txt && \
-	python -m pip install --prefix=/install --timeout 60 jupyterlab jupyterlab-lsp "python-lsp-server[all]"
+	# python -m uv pip install --prefix=/install ./dist/*.whl && \
+	python -m uv pip install --prefix=/install -r ./requirements/requirements.test.txt && \
+	python -m uv pip install --prefix=/install -r ./requirements/requirements.build.txt && \
+	python -m uv pip install --prefix=/install jupyterlab jupyterlab-lsp "python-lsp-server[all]"
 
 
 ## Here is the base image:
@@ -42,8 +44,8 @@ ARG DEBIAN_FRONTEND
 ARG PROJECT_SLUG
 
 ## IMPORTANT!: Get hashed password from build-arg!
-## echo "USER_PASSWORD123" | openssl passwd -5 -stdin
-ARG HASH_PASSWORD="\$5\$Jl675L6M1BQQTRWr\$O35sVvpaT4dQVt.G9o9ZDnp0i1Ub05rEqfEzb8Gh00D"
+## echo "USER_PASSWORD123" | openssl passwd -6 -stdin
+ARG HASH_PASSWORD="\$6\$E262BgUoc/atUJ.9\$15DcOM.oC8TDlslhRFMvEm4vyx1W7GDrf1Ica0U78q5d5GupC0iNlwa7yP9LzmS3YeaIw5XwONm.1QuArpYu20"
 ## python -c "from jupyter_server.auth import passwd; print(passwd('USER_PASSWORD123'))"
 # ARG JUPYTERLAB_PASSWORD_HASH="argon2:\$argon2id\$v=19\$m=10240,t=10,p=8\$wnIeLsNlGKEyUUTxl1lVSg\$dy9k/D3w95OpTbAJbm3nl5Q+J97cmA/RG4whANSBKZk" # pragma: allowlist secret
 ARG UID=1000
@@ -96,7 +98,7 @@ RUN rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/*
 		vim \
 		nano && \
 	apt-get clean -y && \
-	python -m pip install --timeout 60 -U --no-cache-dir pip && \
+	python -m pip install --timeout 60 -U --no-cache-dir pip uv && \
 	python -m pip cache purge && \
 	sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 	sed -i -e 's/# en_AU.UTF-8 UTF-8/en_AU.UTF-8 UTF-8/' /etc/locale.gen && \
