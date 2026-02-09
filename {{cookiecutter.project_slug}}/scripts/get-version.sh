@@ -14,7 +14,7 @@ cd "${_PROJECT_DIR}" || exit 2
 
 
 ## --- Variables --- ##
-# Load from envrionment variables:
+# Load from environment variables:
 VERSION_FILE_PATH="${VERSION_FILE_PATH:-./src/{{cookiecutter.module_name}}/__version__.py}"
 ## --- Variables --- ##
 
