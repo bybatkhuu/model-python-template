@@ -30,7 +30,7 @@ fi
 
 
 ## --- Variables --- ##
-# Load from envrionment variables:
+# Load from environment variables:
 MODULE_NAME="${MODULE_NAME:-simple_model}"
 MODULE_DIR="${MODULE_DIR:-./src/${MODULE_NAME}}"
 OUTPUT_DIR="${OUTPUT_DIR:-./docs/diagrams}"
