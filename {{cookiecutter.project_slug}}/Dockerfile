@@ -76,9 +76,13 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN --mount=type=secret,id=HASH_PASSWORD \
 	rm -vrf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /root/.cache/* && \
 	apt-get clean -y && \
+	# echo "Acquire::http::Pipeline-Depth 0;" >> /etc/apt/apt.conf.d/99fixbadproxy && \
+	# echo "Acquire::http::No-Cache true;" >> /etc/apt/apt.conf.d/99fixbadproxy && \
+	# echo "Acquire::BrokenProxy true;" >> /etc/apt/apt.conf.d/99fixbadproxy && \
 	apt-get update --fix-missing -o Acquire::CompressionTypes::Order::=gz && \
 	apt-get install -y --no-install-recommends \
 		sudo \
+		gosu \
 		ca-certificates \
 		locales \
 		tzdata \
@@ -110,11 +114,13 @@ RUN --mount=type=secret,id=HASH_PASSWORD \
 	echo "LC_ALL=en_AU.UTF-8" >> /etc/default/locale && \
 	addgroup --gid ${GID} ${GROUP} && \
 	useradd -lmN -d "/home/${USER}" -s /bin/bash -g ${GROUP} -G sudo -u ${UID} ${USER} && \
-	echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
-	chmod 0440 "/etc/sudoers.d/${USER}" && \
+	# echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
+	# chmod 0440 "/etc/sudoers.d/${USER}" && \
 	if [ -f "/run/secrets/HASH_PASSWORD" ]; then \
+		echo "Using hashed password from secret: /run/secrets/HASH_PASSWORD"; \
 		echo -e "${USER}:$(cat /run/secrets/HASH_PASSWORD)" | chpasswd -e; \
 	else \
+		echo "Using hashed password from build argument: HASH_PASSWORD"; \
 		echo -e "${USER}:${HASH_PASSWORD}" | chpasswd -e; \
 	fi && \
 	echo -e "\nalias ls='ls -aF --group-directories-first --color=auto'" >> /root/.bashrc && \
@@ -148,9 +154,9 @@ FROM base AS app
 
 WORKDIR "${PROJECT_DIR}"
 COPY --chown=${UID}:${GID} ./ ${PROJECT_DIR}
-COPY --chown=${UID}:${GID} --chmod=770 ./scripts/docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --chown=${UID}:${GID} --chmod=770 ./scripts/docker/*.sh /usr/local/bin/
 
 # EXPOSE ${SSH_PORT} ${JUPYTERLAB_PORT}
-USER ${UID}:${GID}
+# USER ${UID}:${GID}
 
 ENTRYPOINT ["docker-entrypoint.sh"]
