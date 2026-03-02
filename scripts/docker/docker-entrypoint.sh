@@ -11,7 +11,7 @@ _run()
 	fi
 
 	echo "[INFO]: Starting Jupyter Lab..."
-	exec jupyter lab --port="${JUPYTERLAB_PORT:-8888}" || exit 2
+	exec gosu "${USER}:${GROUP}" jupyter lab --port="${JUPYTERLAB_PORT:-8888}" || exit 2
 	exit 0
 }
 
@@ -26,7 +26,7 @@ main()
 			-type d -name "modules" -o \
 			-type d -name "volumes" \
 		\) -prune -o -print0 | \
-			sudo xargs -0 chown -c "${USER}:${GROUP}" || exit 2
+			xargs -0 chown -c "${USER}:${GROUP}" || exit 2
 
 	# find "${PROJECT_DIR}" \
 	# 	\( \
@@ -36,7 +36,7 @@ main()
 	# 		-type d -name "modules" -o \
 	# 		-type d -name "volumes" \
 	# 	\) -prune -o -type d -exec \
-	# 		sudo chmod 775 {} + || exit 2
+	# 		chmod 775 {} + || exit 2
 
 	# find "${PROJECT_DIR}" \
 	# 	\( \
@@ -47,7 +47,7 @@ main()
 	# 		-type d -name "volumes" -o \
 	# 		-type d -name "examples" \
 	# 	\) -prune -o -type f -exec \
-	# 		sudo chmod 664 {} + || exit 2
+	# 		chmod 664 {} + || exit 2
 
 	# find "${PROJECT_DIR}" \
 	# 	\( \
@@ -57,11 +57,11 @@ main()
 	# 		-type d -name "modules" -o \
 	# 		-type d -name "volumes" \
 	# 	\) -prune -o -type d -exec \
-	# 		sudo chmod ug+s {} + || exit 2
+	# 		chmod ug+s {} + || exit 2
 
-	jupyter labextension disable "@jupyterlab/apputils-extension:announcements" || exit 2
-	sudo /usr/sbin/sshd -p "${SSH_PORT:-22}" || exit 2
-	echo "${USER} ALL=(ALL) ALL" | sudo tee -a "/etc/sudoers.d/${USER}" > /dev/null || exit 2
+	gosu "${USER}:${GROUP}" jupyter labextension disable "@jupyterlab/apputils-extension:announcements" || exit 2
+	/usr/sbin/sshd -p "${SSH_PORT:-22}" || exit 2
+	# echo "${USER} ALL=(ALL) ALL" | tee -a "/etc/sudoers.d/${USER}" > /dev/null || exit 2
 	echo ""
 
 	## Parsing input:
@@ -73,10 +73,10 @@ main()
 			shift
 			if [ -z "${*:-}" ]; then
 				echo "[INFO]: Starting bash..."
-				/bin/bash
+				exec gosu "${USER}:${GROUP}" /bin/bash
 			else
 				echo "[INFO]: Executing command -> ${*}"
-				exec /bin/bash -c "${@}" || exit 2
+				exec gosu "${USER}:${GROUP}" /bin/bash -c "${@}" || exit 2
 			fi
 			exit 0;;
 		*)
