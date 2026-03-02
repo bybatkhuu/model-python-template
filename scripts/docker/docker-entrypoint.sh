@@ -23,8 +23,11 @@ main()
 		\( \
 			-type d -name ".git" -o \
 			-type d -name ".venv" -o \
+			-type d -name "venv" -o \
+			-type d -name "env" -o \
 			-type d -name "modules" -o \
-			-type d -name "volumes" \
+			-type d -name "volumes" -o \
+			-type l -name ".env" \
 		\) -prune -o -print0 | \
 			xargs -0 chown -c "${USER}:${GROUP}" || exit 2
 
@@ -32,6 +35,8 @@ main()
 	# 	\( \
 	# 		-type d -name ".git" -o \
 	# 		-type d -name ".venv" -o \
+	# 		-type d -name "venv" -o \
+	# 		-type d -name "env" -o \
 	# 		-type d -name "scripts" -o \
 	# 		-type d -name "modules" -o \
 	# 		-type d -name "volumes" \
@@ -42,10 +47,13 @@ main()
 	# 	\( \
 	# 		-type d -name ".git" -o \
 	# 		-type d -name ".venv" -o \
+	# 		-type d -name "venv" -o \
+	# 		-type d -name "env" -o \
 	# 		-type d -name "scripts" -o \
 	# 		-type d -name "modules" -o \
 	# 		-type d -name "volumes" -o \
-	# 		-type d -name "examples" \
+	# 		-type d -name "examples" -o \
+	# 		-type l -name ".env" \
 	# 	\) -prune -o -type f -exec \
 	# 		chmod 664 {} + || exit 2
 
@@ -53,6 +61,8 @@ main()
 	# 	\( \
 	# 		-type d -name ".git" -o \
 	# 		-type d -name ".venv" -o \
+	# 		-type d -name "venv" -o \
+	# 		-type d -name "env" -o \
 	# 		-type d -name "scripts" -o \
 	# 		-type d -name "modules" -o \
 	# 		-type d -name "volumes" \
