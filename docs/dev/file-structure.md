@@ -1,5 +1,5 @@
 ---
-title: File Structure
+title: "File Structure"
 ---
 
 # 📂 File Structure
