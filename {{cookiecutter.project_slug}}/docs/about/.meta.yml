@@ -1,4 +1,4 @@
 tags:
   - about
-hide:
-  - tags
+# hide:
+#   - tags

@@ -1,5 +1,5 @@
 ---
-title: Error Codes
+title: "Error Codes"
 ---
 
 # 🚨 Error Codes
