@@ -31,42 +31,32 @@ For **DEVELOPMENT** environment:
 
 ### 2. 📥 Download or clone the repository
 
-**2.1.** Prepare projects directory (if not exists):
-
 ```sh
 # Create projects directory:
 mkdir -pv ~/workspaces/projects
 
 # Enter into projects directory:
 cd ~/workspaces/projects
+
+# Clone the repository:
+git clone [REPOSITORY_URL]
+# Or download and extract the repository from GitHub:
+# 1. Go to the repository on GitHub.
+# 2. Click on the "Code" button.
+# 3. Select "Download ZIP" and save the file to your computer.
+# 4. Extract the ZIP file in current directory.
+
+# Enter into the repository:
+cd model-python-template
+
+# Change to cookiecutter branch:
+git checkout cookiecutter
 ```
-
-**2.2.** Follow one of the below options **[A]**, **[B]** or **[C]**:
-
-**OPTION A.** Clone the repository:
-
-```sh
-git clone https://github.com/[OWNER]/model-python-template.git && \
-    cd model-python-template && \
-    git checkout cookiecutter
-```
-
-**OPTION B.** Clone the repository (for **DEVELOPMENT**: git + ssh key):
-
-```sh
-git clone git@github.com:[OWNER]/model-python-template.git && \
-    cd model-python-template && \
-    git checkout cookiecutter
-```
-
-**OPTION C.** Download source code from cookiecutter branch.
 
 ### 3. 📦 Install cookiecutter
 
 ```bash
 # Install cookiecutter:
-pip install -U cookiecutter
-# Or:
 pip install -r ./requirements.txt
 ```
 
@@ -82,9 +72,7 @@ cookiecutter -f .
 ### 5. 🏁 Start the project
 
 ```bash
-cd [PROJECT_NAME]
-# For example:
-cd model-python-template
+cd [PROJECT_SLUG]
 ```
 
 👍
