@@ -10,6 +10,12 @@ cd "${_PROJECT_DIR}" || exit 2
 
 # shellcheck disable=SC1091
 [ -f .env ] && . .env
+
+
+if [ ! -f ./scripts/get-version.sh ]; then
+	echo "[ERROR]: 'get-version.sh' script not found!" >&2
+	exit 1
+fi
 ## --- Base --- ##
 
 
