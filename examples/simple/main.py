@@ -14,7 +14,6 @@ from numpy.typing import NDArray
 # Internal modules
 from simple_model import SimpleModel
 
-
 logger = logging.getLogger(__name__)
 
 

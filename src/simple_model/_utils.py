@@ -6,7 +6,6 @@ from pydantic import validate_call, constr
 
 from ._consts import WarnEnum
 
-
 logger = logging.getLogger(__name__)
 
 
