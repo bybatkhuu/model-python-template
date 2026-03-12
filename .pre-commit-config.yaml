@@ -118,6 +118,16 @@ repos:
         name: "🐚 shellcheck - Lint shell scripts"
         files: \.sh$
 
+  # --- Markdown ---
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.48.0
+    hooks:
+      - id: markdownlint
+        name: "📝 markdownlint - Lint markdown files"
+        args: ["--fix"]
+        exclude: |
+          (?x)^(docs/release-notes.md|CHANGELOG.md)$
+
   # --- Jupyter notebooks ---
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.9.1
