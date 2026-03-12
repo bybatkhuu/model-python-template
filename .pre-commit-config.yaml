@@ -115,6 +115,16 @@ repos:
         name: "🐚 shellcheck - Lint shell scripts"
         files: \.sh$
 
+  # --- Markdown ---
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.48.0
+    hooks:
+      - id: markdownlint
+        name: "📝 markdownlint - Lint markdown files"
+        args: ["--fix"]
+        exclude: |
+          (?x)^(docs/release-notes.md|CHANGELOG.md)$
+
   # --- Python ---
   - repo: https://github.com/psf/black
     rev: 26.1.0
@@ -140,7 +150,7 @@ repos:
         args: ["--max-line-length=120"]
 
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.9.3
+    rev: 1.9.4
     hooks:
       - id: bandit
         name: "🐍 bandit - Find python security issues"
