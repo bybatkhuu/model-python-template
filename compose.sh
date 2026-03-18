@@ -114,7 +114,7 @@ _exec()
 
 	echo "[INFO]: Executing command inside '${_DEFAULT_SERVICE}' container..."
 	# shellcheck disable=SC2068
-	docker compose exec "${_DEFAULT_SERVICE}" ${@} || exit 2
+	docker compose exec "${_DEFAULT_SERVICE}" $@ || exit 2
 }
 
 _enter()
