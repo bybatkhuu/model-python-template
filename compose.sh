@@ -37,7 +37,8 @@ _DEFAULT_SERVICE="model"
 ## --- Functions --- ##
 _build()
 {
-	docker compose --progress=plain build || exit 2
+	# shellcheck disable=SC2068
+	docker compose --progress=plain build $@ || exit 2
 }
 
 _validate()
@@ -50,11 +51,11 @@ _start()
 	if [ "${1:-}" == "-l" ]; then
 		shift
 		# shellcheck disable=SC2068
-		docker compose up -d --remove-orphans --force-recreate ${@:-} || exit 2
-		_logs "${@:-}"
+		docker compose up -d --remove-orphans --force-recreate $@ || exit 2
+		_logs "$@"
 	else
 		# shellcheck disable=SC2068
-		docker compose up -d --remove-orphans --force-recreate ${@:-} || exit 2
+		docker compose up -d --remove-orphans --force-recreate $@ || exit 2
 	fi
 }
 
@@ -64,7 +65,7 @@ _stop()
 		docker compose down --remove-orphans || exit 2
 	else
 		# shellcheck disable=SC2068
-		docker compose rm -sfv ${@:-} || exit 2
+		docker compose rm -sfv $@ || exit 2
 	fi
 }
 
@@ -72,19 +73,19 @@ _restart()
 {
 	if [ "${1:-}" == "-l" ]; then
 		shift
-		_stop "${@:-}" || exit 2
-		_start -l "${@:-}" || exit 2
+		_stop "$@" || exit 2
+		_start -l "$@" || exit 2
 	else
-		_stop "${@:-}" || exit 2
-		_start "${@:-}" || exit 2
+		_stop "$@" || exit 2
+		_start "$@" || exit 2
 	fi
-	# docker compose restart ${@:-} || exit 2
+	# docker compose restart $@ || exit 2
 }
 
 _logs()
 {
 	# shellcheck disable=SC2068
-	docker compose logs -f --tail 100 ${@} || exit 2
+	docker compose logs -f -n 100 $@ || exit 2
 }
 
 _list()
@@ -95,13 +96,13 @@ _list()
 _ps()
 {
 	# shellcheck disable=SC2068
-	docker compose top ${@:-} || exit 2
+	docker compose top $@ || exit 2
 }
 
 _stats()
 {
 	# shellcheck disable=SC2068
-	docker compose stats ${@:-} || exit 2
+	docker compose stats $@ || exit 2
 }
 
 _exec()
@@ -130,27 +131,27 @@ _enter()
 _images()
 {
 	# shellcheck disable=SC2068
-	docker compose images ${@:-} || exit 2
+	docker compose images $@ || exit 2
 }
 
 _clean()
 {
 	# shellcheck disable=SC2068
-	docker compose down -v --remove-orphans ${@:-} || exit 2
+	docker compose down -v --remove-orphans $@ || exit 2
 }
 
 _update()
 {
 	if docker compose ps | grep 'Up' > /dev/null 2>&1; then
-		_stop "${@:-}" || exit 2
+		_stop "$@" || exit 2
 	fi
 
 	# shellcheck disable=SC2068
-	docker compose pull --policy always ${@:-} || exit 2
+	docker compose pull --policy always $@ || exit 2
 	# shellcheck disable=SC2046
 	docker rmi -f $(docker images --filter "dangling=true" -q --no-trunc) > /dev/null 2>&1 || true
 
-	# _start "${@:-}" || exit 2
+	# _start "$@" || exit 2
 }
 ## --- Functions --- ##
 
@@ -166,7 +167,7 @@ COMMANDS:
     start | run | up
     stop | down | remove | rm | delete | del
     restart
-    logs
+    logs | log
     list
     ps
     stats | resource | limit
@@ -191,7 +192,7 @@ while [ $# -gt 0 ]; do
 	case "${1}" in
 		build)
 			shift
-			_build
+			_build "$@"
 			exit 0;;
 		validate | valid | config)
 			shift
@@ -199,19 +200,19 @@ while [ $# -gt 0 ]; do
 			exit 0;;
 		start | run | up)
 			shift
-			_start "${@:-}"
+			_start "$@"
 			exit 0;;
 		stop | down | remove | rm | delete | del)
 			shift
-			_stop "${@:-}"
+			_stop "$@"
 			exit 0;;
 		restart)
 			shift
-			_restart "${@:-}"
+			_restart "$@"
 			exit 0;;
-		logs)
+		logs | log)
 			shift
-			_logs "${@:-}"
+			_logs "$@"
 			exit 0;;
 		list)
 			shift
@@ -219,31 +220,31 @@ while [ $# -gt 0 ]; do
 			exit 0;;
 		ps)
 			shift
-			_ps "${@:-}"
+			_ps "$@"
 			exit 0;;
 		stats | resource | limit)
 			shift
-			_stats
+			_stats "$@"
 			exit 0;;
 		exec)
 			shift
-			_exec "${@:-}"
+			_exec "$@"
 			exit 0;;
 		enter)
 			shift
-			_enter "${@:-}"
+			_enter "$@"
 			exit 0;;
 		images)
 			shift
-			_images "${@:-}"
+			_images "$@"
 			exit 0;;
 		clean | clear)
 			shift
-			_clean "${@:-}"
+			_clean "$@"
 			exit 0;;
 		update | pull | download)
 			shift
-			_update "${@:-}"
+			_update "$@"
 			exit 0;;
 		-h | --help)
 			_usage_help
