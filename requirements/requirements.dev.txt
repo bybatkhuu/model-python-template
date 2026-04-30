@@ -5,4 +5,4 @@
 # -r ./requirements.extra.txt
 pyright>=1.1.392,<2.0.0
 pre-commit>=4.0.1,<5.0.0
-jupyterlab>=4.0.13,<5.0.0
+jupyterlab>=4.5.7,<5.0.0
