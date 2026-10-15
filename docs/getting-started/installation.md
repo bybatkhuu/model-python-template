@@ -6,7 +6,7 @@ title: Installation
 
 ## 1. 📥 Download or clone the repository
 
-[TIP] Skip this step, if you're going to install the module directly from **git** repository.
+[TIP] Skip this step, if you're going to install the module directly from **GitHub** repository.
 
 ```sh
 mkdir -pv ~/workspaces/projects
