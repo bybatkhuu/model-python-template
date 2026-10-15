@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # check=skip=SecretsUsedInArgOrEnv
 
-ARG PYTHON_VERSION=3.10
+ARG PYTHON_VERSION=3.11
 ARG BASE_IMAGE=python:${PYTHON_VERSION}-slim-trixie
 
 ARG DEBIAN_FRONTEND=noninteractive
