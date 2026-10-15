@@ -1,0 +1,36 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class ExtraBaseModel {
+            model_config : ConfigDict
+          }
+          class ModelConfigPM {
+            modelName : Annotated
+            models_dir : Annotated
+            threshold : Optional[float]
+          }
+          class SimpleModel {
+            config
+            model
+            is_model_files_exist(models_dir: str, model_name: str) bool
+            is_similar(X: NDArray[Any], y: NDArray[Any], threshold: float | None) bool
+            is_trained() bool
+            load() None
+            predict(X: NDArray[Any]) NDArray[Any]
+            run(X: NDArray[Any], y: NDArray[Any] | None) NDArray[Any]
+            save() None
+            score(y_true: NDArray[Any], y_pred: NDArray[Any]) float
+            train(X: NDArray[Any], y: NDArray[Any]) None
+          }
+          class WarnEnum {
+            name
+          }
+          ModelConfigPM --|> ExtraBaseModel
+          ModelConfigPM --* SimpleModel : config
+  
+       </div>
+  </body>
+</html>
