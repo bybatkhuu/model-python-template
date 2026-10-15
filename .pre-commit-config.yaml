@@ -1,6 +1,6 @@
 fail_fast: true
 default_language_version:
-  python: python3.10
+  python: python3.11
 exclude: |
   (?x)^(
       \.git/.*
@@ -157,7 +157,7 @@ repos:
     hooks:
       - id: pyupgrade
         name: "🐍 pyupgrade - Upgrade python syntax"
-        entry: "pyupgrade --py310-plus"
+        entry: "pyupgrade --py311-plus"
         files: \.pyi?$
 
   - repo: https://github.com/PyCQA/flake8
