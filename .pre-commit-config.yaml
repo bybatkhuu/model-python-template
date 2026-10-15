@@ -1,6 +1,6 @@
 fail_fast: true
 default_language_version:
-  python: python3.10
+  python: python3.11
 exclude: |
   (?x)^(
       \.git/.*
@@ -146,22 +146,22 @@ repos:
 
   # --- Python ---
   - repo: https://github.com/psf/black
-    rev: 26.5.1
+    rev: 26.10.1
     hooks:
       - id: black
         name: "🐍 black - Format python code"
         files: \.pyi?$
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+    rev: v3.22.0
     hooks:
       - id: pyupgrade
         name: "🐍 pyupgrade - Upgrade python syntax"
-        entry: "pyupgrade --py310-plus"
+        entry: "pyupgrade --py311-plus"
         files: \.pyi?$
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
+    rev: 7.4.1
     hooks:
       - id: flake8
         name: "🐍 flake8 - Lint python code"
